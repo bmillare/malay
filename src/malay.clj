@@ -4,6 +4,17 @@
 
 ;; This is a simple file storage service that uses ideas from datomic
 
+(defn max-folder-id [folder]
+  (let [files (dj.io/ls (dj.io/file folder))]
+    (apply max (map (fn [f]
+                      (-> f
+                          dj.io/get-name
+                          Integer/parseInt))
+                    files))))
+
+(defn new-folder-id [folder]
+  (dj.io/mkdir (dj.io/file folder (str (inc (max-folder-id folder))))))
+
 ;; a 'store' is defined as a folder that:
 ;; -contains a metadata file named 'metadata'
 ;; -contains any number of 'partition' folders
